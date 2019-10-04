@@ -1,6 +1,7 @@
 use crate::{
     get_array_ref,
     get_global,
+    PollCode,
 };
 use rapidus::{
     parser::Parser,
@@ -9,6 +10,16 @@ use rapidus::{
         vm::VM,
     },
 };
+use reqwest::Url;
+use std::time::{
+    SystemTime,
+    UNIX_EPOCH,
+};
+
+fn get_time_ms() -> u128 {
+    let start = SystemTime::now();
+    start.duration_since(UNIX_EPOCH).unwrap().as_millis()
+}
 
 #[derive(Debug)]
 pub struct Quiz {
@@ -51,6 +62,25 @@ impl Quiz {
             referer,
             va,
         })
+    }
+
+    pub fn get_code_url(&self) -> Option<Url> {
+        let url_str = format!(
+            "https://polldaddy.com/n/{hash}/{id}?{time}",
+            hash = self.hash,
+            id = self.id,
+            time = get_time_ms()
+        );
+
+        Url::parse(&url_str).ok()
+    }
+
+    pub fn get_vote_url(&self, answer: u32, code: &PollCode) -> Option<Url> {
+        let url_str = format!(
+            "https://polls.polldaddy.com/vote-js.php?p={id}&b=1&a={answer},&o=&va={va}&cookie=0&n={code}&url={referer}",
+            id = self.id, answer = answer, va = self.va, code = code.as_str(), referer = self.referer
+        );
+        Url::parse(&url_str).ok()
     }
 
     pub fn get_id(&self) -> u32 {

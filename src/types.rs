@@ -1,7 +1,9 @@
 pub mod quiz;
-use crate::Quiz;
 
-use crate::get_global;
+use crate::{
+    get_global,
+    Quiz,
+};
 use rapidus::{
     parser::Parser,
     vm::{
@@ -189,5 +191,39 @@ impl AnswerResponse {
 
     pub fn get_percent(&self) -> f32 {
         self.percent
+    }
+}
+
+#[derive(Debug)]
+pub struct PollCode(String);
+
+impl PollCode {
+    pub fn from_script_data(data: &str, quiz: &Quiz) -> Option<PollCode> {
+        let data = format!(
+            r#"
+var PD_vote{} = function(){{
+		
+}}
+{}
+"#,
+            quiz.get_id(),
+            data
+        );
+        let mut vm = VM::new();
+        let mut parser = Parser::new("main", data);
+        let node = parser.parse_all().ok()?;
+        let func_info = vm.compile(&node, true).ok()?;
+        vm.run_global(func_info).ok()?;
+        let code = get_global(&vm, &format!("PDV_n{}", quiz.get_id()))?.to_string();
+
+        Some(PollCode(code))
+    }
+
+    pub fn get_string(self) -> String {
+        self.0
+    }
+
+    pub fn as_str(&self) -> &str {
+        &self.0
     }
 }

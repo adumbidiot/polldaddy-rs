@@ -6,19 +6,17 @@ pub use crate::types::{
         QuizAnswer,
     },
     HtmlResponse,
+    PollCode,
     VoteResponse,
 };
 use rand::seq::IteratorRandom;
-use rapidus::{
-    parser::Parser,
-    vm::{
-        jsvalue::{
-            array::ArrayObjectInfo,
-            object::ObjectKind,
-            value::Value as JsValue,
-        },
-        vm::VM,
+use rapidus::vm::{
+    jsvalue::{
+        array::ArrayObjectInfo,
+        object::ObjectKind,
+        value::Value as JsValue,
     },
+    vm::VM,
 };
 use reqwest::{
     header::{
@@ -35,10 +33,6 @@ use select::{
         Name,
     },
 };
-use std::time::{
-    SystemTime,
-    UNIX_EPOCH,
-};
 
 pub const AGENTS: &str = include_str!("user-agents.txt");
 
@@ -48,11 +42,8 @@ pub type PollResult<T> = Result<T, PollError>;
 pub enum PollError {
     Network,
     InvalidBody,
-}
 
-fn get_time_ms() -> u128 {
-    let start = SystemTime::now();
-    start.duration_since(UNIX_EPOCH).unwrap().as_millis()
+    Unknown(&'static str),
 }
 
 fn get_array_ref(val: &JsValue) -> Option<&ArrayObjectInfo> {
@@ -91,16 +82,13 @@ impl Client {
     }
 
     fn get_poll_code(&self, agent: &str, quiz: &Quiz) -> PollResult<PollCode> {
-        let url = format!(
-            "https://polldaddy.com/n/{hash}/{id}?{time}",
-            hash = quiz.get_hash(),
-            id = quiz.get_id(),
-            time = get_time_ms()
-        );
+        let url = quiz
+            .get_code_url()
+            .ok_or(PollError::Unknown("Unable to generate code url"))?;
 
         let mut res = self
             .client
-            .get(&url)
+            .get(url)
             .header(USER_AGENT, agent)
             .header(REFERER, quiz.get_referer())
             .send()
@@ -119,14 +107,13 @@ impl Client {
         let agent = Self::get_agent();
         let code = self.get_poll_code(agent, &quiz)?;
 
-        let url = format!(
-            "https://polls.polldaddy.com/vote-js.php?p={}&b=1&a={},&o=&va={}&cookie=0&n={}&url={referer}",
-            quiz.get_id(), choice, quiz.get_va(), code.0, referer = quiz.get_referer()
-        );
+        let url = quiz
+            .get_vote_url(choice, &code)
+            .ok_or(PollError::Unknown("Unable to generate vote url"))?;
 
         let mut res = self
             .client
-            .get(&url)
+            .get(url)
             .header(USER_AGENT, agent)
             .header(REFERER, quiz.get_referer())
             .send()
@@ -179,32 +166,6 @@ impl Client {
                 Quiz::from_script_data(referer.to_string(), id, &body).ok_or(PollError::InvalidBody)
             })
             .collect())
-    }
-}
-
-#[derive(Debug)]
-struct PollCode(String);
-
-impl PollCode {
-    fn from_script_data(data: &str, quiz: &Quiz) -> Option<PollCode> {
-        let data = format!(
-            r#"
-var PD_vote{} = function(){{
-		
-}}
-{}
-"#,
-            quiz.get_id(),
-            data
-        );
-        let mut vm = VM::new();
-        let mut parser = Parser::new("main", data);
-        let node = parser.parse_all().ok()?;
-        let func_info = vm.compile(&node, true).ok()?;
-        vm.run_global(func_info).ok()?;
-        let code = get_global(&vm, &format!("PDV_n{}", quiz.get_id()))?.to_string();
-
-        Some(PollCode(code))
     }
 }
 
