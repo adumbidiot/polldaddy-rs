@@ -1,0 +1,22 @@
+[package]
+name = "polldaddy"
+version = "0.0.1"
+authors = ["adumbidiot <nathaniel.daniel23@outlook.com>"]
+edition = "2018"
+default-run = "polldaddy-spam"
+
+[lib]
+path = "src/lib.rs"
+edition = "2018"
+
+[[bin]]
+name = "polldaddy-spam"
+path = "src/bin/spam.rs"
+
+[dependencies]
+reqwest = "0.9.21"
+rand = "0.7.2"
+rapidus = { git = "https://github.com/maekawatoshiki/rapidus", rev = "f586810c0d205206ab1b1054a2901e1871e1496f" }
+serde = { version = "1.0.101", features = [ "derive" ] }
+serde_json = "1.0.41"
+select = "0.4.3"
