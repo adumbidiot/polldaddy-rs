@@ -1,16 +1,11 @@
 pub mod quiz;
 
 use crate::{
+    exec_js,
     get_global,
     Quiz,
 };
-use rapidus::{
-    parser::Parser,
-    vm::{
-        jsvalue::value::Value as JsValue,
-        vm::VM,
-    },
-};
+use rapidus::vm::jsvalue::value::Value as JsValue;
 use select::{
     document::Document,
     predicate::{
@@ -61,11 +56,7 @@ window.location.href = "";
             data,
             id = quiz.get_id()
         );
-        let mut vm = VM::new();
-        let mut parser = Parser::new("main", data);
-        let node = parser.parse_all().ok()?;
-        let func_info = vm.compile(&node, true).ok()?;
-        vm.run_global(func_info).ok()?;
+        let vm = exec_js(&data)?;
         let val = get_global(&vm, "ret")?;
         let data = serde_json::from_str(&val.to_string()).ok()?;
         let html = get_global(&vm, "html")?
@@ -209,11 +200,8 @@ var PD_vote{} = function(){{
             quiz.get_id(),
             data
         );
-        let mut vm = VM::new();
-        let mut parser = Parser::new("main", data);
-        let node = parser.parse_all().ok()?;
-        let func_info = vm.compile(&node, true).ok()?;
-        vm.run_global(func_info).ok()?;
+
+        let vm = exec_js(&data)?;
         let code = get_global(&vm, &format!("PDV_n{}", quiz.get_id()))?.to_string();
 
         Some(PollCode(code))

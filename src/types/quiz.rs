@@ -1,15 +1,10 @@
 use crate::{
+    exec_js,
     get_array_ref,
     get_global,
     PollCode,
 };
-use rapidus::{
-    parser::Parser,
-    vm::{
-        jsvalue::value::Value as JsValue,
-        vm::VM,
-    },
-};
+use rapidus::vm::jsvalue::value::Value as JsValue;
 use reqwest::Url;
 use std::time::{
     SystemTime,
@@ -38,12 +33,7 @@ impl Quiz {
             .filter(|line| !line.starts_with("var PDV_def"))
             .collect(); // Js Engine is REALLY buggy. Need to weed out line that crashes the parser.
 
-        let mut vm = VM::new();
-        let mut parser = Parser::new("main", &data);
-        let node = parser.parse_all().ok()?;
-        let func_info = vm.compile(&node, true).ok()?;
-        vm.run_global(func_info).ok()?;
-
+        let vm = exec_js(&data)?;
         let hash = get_global(&vm, &format!("PDV_h{}", id))?.to_string();
         let closed = get_global(&vm, &format!("pollClosed{}", id))?.into_bool();
         let va = get_global(&vm, &format!("PDV_va{}", id))?.to_string();

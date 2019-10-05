@@ -10,21 +10,22 @@ pub use crate::types::{
     VoteResponse,
 };
 use rand::seq::IteratorRandom;
-use rapidus::vm::{
-    jsvalue::{
-        array::ArrayObjectInfo,
-        object::ObjectKind,
-        value::Value as JsValue,
+use rapidus::{
+    parser::Parser,
+    vm::{
+        jsvalue::{
+            array::ArrayObjectInfo,
+            object::ObjectKind,
+            value::Value as JsValue,
+        },
+        vm::VM,
     },
-    vm::VM,
 };
-use reqwest::{
-    header::{
-        REFERER,
-        USER_AGENT,
-    },
-    Url,
+use reqwest::header::{
+    REFERER,
+    USER_AGENT,
 };
+pub use reqwest::Url;
 use select::{
     document::Document,
     predicate::{
@@ -48,8 +49,8 @@ pub enum PollError {
 
 fn get_array_ref(val: &JsValue) -> Option<&ArrayObjectInfo> {
     match val {
-        JsValue::Object(obj) => {
-            let obj = unsafe { &**obj };
+        JsValue::Object(obj_ptr) => {
+            let obj = unsafe { &**obj_ptr };
             match &obj.kind {
                 ObjectKind::Array(a) => Some(&a),
                 _ => None,
@@ -61,6 +62,15 @@ fn get_array_ref(val: &JsValue) -> Option<&ArrayObjectInfo> {
 
 fn get_global(vm: &VM, val: &str) -> Option<JsValue> {
     vm.current_context.variable_environment.get_value(val).ok()
+}
+
+pub fn exec_js(data: &str) -> Option<VM> {
+    let mut vm = VM::new();
+    let mut parser = Parser::new("main", data);
+    let node = parser.parse_all().ok()?;
+    let func_info = vm.compile(&node, true).ok()?;
+    vm.run_global(func_info).ok()?;
+    Some(vm)
 }
 
 pub struct Client {
