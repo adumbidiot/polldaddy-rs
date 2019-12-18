@@ -8,7 +8,7 @@ Add the following to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-polldaddy = { git = "https://github.com/adumbidiot/polldaddy-rs", rev = "df05dc882c1b12669b7971913393f6f3fd3fb454" }
+polldaddy = { git = "https://github.com/adumbidiot/polldaddy-rs", rev = "56affa89bb9953d840de489763f7fef28092e6a3" }
 ```
 
 ## Getting Started
