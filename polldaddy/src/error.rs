@@ -6,6 +6,58 @@ pub use crate::{
 
 pub type PollResult<T> = Result<T, PollError>;
 
+/// Ducc Error type with Send
+#[derive(Debug)]
+pub struct SendDuccError {
+    pub kind: ErrorKind,
+    pub context: Vec<String>,
+}
+
+impl SendDuccError {
+    pub fn from_ducc_error_lossy(e: ducc::Error) -> Self {
+        SendDuccError {
+            kind: ErrorKind::from_ducc_error_kind_lossy(e.kind),
+            context: e.context,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub enum ErrorKind {
+    ToJsConversionError {
+        from: &'static str,
+        to: &'static str,
+    },
+    FromJsConversionError {
+        from: &'static str,
+        to: &'static str,
+    },
+    RuntimeError {
+        code: ducc::RuntimeErrorCode,
+        name: String,
+    },
+    RecursiveMutCallback,
+	ExternalError,
+    NotAFunction,
+}
+
+impl ErrorKind {
+    pub fn from_ducc_error_kind_lossy(kind: ducc::ErrorKind) -> Self {
+        match kind {
+            ducc::ErrorKind::ToJsConversionError { from, to } => {
+                ErrorKind::ToJsConversionError { from, to }
+            }
+            ducc::ErrorKind::FromJsConversionError { from, to } => {
+                ErrorKind::FromJsConversionError { from, to }
+            }
+            ducc::ErrorKind::RuntimeError { code, name } => ErrorKind::RuntimeError { code, name },
+            ducc::ErrorKind::RecursiveMutCallback => ErrorKind::RecursiveMutCallback,
+			ducc::ErrorKind::ExternalError(_) => ErrorKind::ExternalError, // Data may or may not be Send. We must remove it to be Send.
+            ducc::ErrorKind::NotAFunction => ErrorKind::NotAFunction,
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum PollError {
     Reqwest(reqwest::Error),

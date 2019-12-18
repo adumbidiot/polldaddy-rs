@@ -1,4 +1,5 @@
 use crate::{
+    error::SendDuccError,
     util::{
         get_time_ms,
         JsEngine,
@@ -9,13 +10,13 @@ use url::Url;
 
 #[derive(Debug)]
 pub enum QuizError {
-    Ducc(ducc::Error),
+    Ducc(SendDuccError),
     QuizAnswer(QuizAnswerError),
 }
 
 impl From<ducc::Error> for QuizError {
     fn from(e: ducc::Error) -> Self {
-        Self::Ducc(e)
+        Self::Ducc(SendDuccError::from_ducc_error_lossy(e))
     }
 }
 

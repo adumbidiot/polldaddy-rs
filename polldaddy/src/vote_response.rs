@@ -1,5 +1,6 @@
 pub mod html_response;
 use crate::{
+    error::SendDuccError,
     util::JsEngine,
     vote_response::html_response::HtmlResponseError,
     HtmlResponse,
@@ -11,12 +12,12 @@ use std::collections::HashMap;
 #[derive(Debug)]
 pub enum VoteResponseError {
     Json(serde_json::Error),
-    Ducc(ducc::Error),
+    Ducc(SendDuccError),
 }
 
 impl From<ducc::Error> for VoteResponseError {
     fn from(e: ducc::Error) -> Self {
-        Self::Ducc(e)
+        Self::Ducc(SendDuccError::from_ducc_error_lossy(e))
     }
 }
 

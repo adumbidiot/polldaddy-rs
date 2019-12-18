@@ -94,24 +94,29 @@ impl Client {
         let res = self.client.get(referer).send().await?; // Probably don't care if the status is invalid
 
         let res = res.bytes().await?.reader();
-        let doc = Document::from_read(res)?;
         let script_filter = And(Name("script"), Attr("src", ()));
-        let iter = doc.find(script_filter).filter_map(|el| {
-            let url = el.attr("src").and_then(|src| Url::parse(src).ok())?;
-            if url.host_str()?.starts_with("secure.polldaddy.com") {
-                let id: u32 = url
-                    .path_segments()?
-                    .last()?
-                    .trim_end_matches(".js")
-                    .parse()
-                    .ok()?;
-                Some((url, id))
-            } else {
-                None
-            }
-        });
+        let data_pairs: Vec<(Url, u32)> = {
+            let doc = Document::from_read(res)?;
 
-        let ret = futures::stream::iter(iter)
+            doc.find(script_filter)
+                .filter_map(|el| {
+                    let url = el.attr("src").and_then(|src| Url::parse(src).ok())?;
+                    if url.host_str()?.starts_with("secure.polldaddy.com") {
+                        let id: u32 = url
+                            .path_segments()?
+                            .last()?
+                            .trim_end_matches(".js")
+                            .parse()
+                            .ok()?;
+                        Some((url, id))
+                    } else {
+                        None
+                    }
+                })
+                .collect()
+        };
+
+        let ret = futures::stream::iter(data_pairs.into_iter())
             .then(|(url, id)| async move {
                 let res = self.client.get(url.as_str()).send().await?;
                 let status = res.status();

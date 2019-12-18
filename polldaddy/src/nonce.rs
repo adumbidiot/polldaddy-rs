@@ -1,16 +1,17 @@
 use crate::{
+    error::SendDuccError,
     util::JsEngine,
     Quiz,
 };
 
 #[derive(Debug)]
 pub enum NonceError {
-    Ducc(ducc::Error),
+    Ducc(SendDuccError),
 }
 
 impl From<ducc::Error> for NonceError {
     fn from(e: ducc::Error) -> Self {
-        Self::Ducc(e)
+        Self::Ducc(SendDuccError::from_ducc_error_lossy(e))
     }
 }
 
