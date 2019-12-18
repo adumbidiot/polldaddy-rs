@@ -1,0 +1,10 @@
+[package]
+name = "polldaddy-spam"
+version = "0.0.1"
+authors = ["adumbidiot <nathaniel.daniel23@outlook.com>"]
+edition = "2018"
+
+[dependencies]
+tokio = { version = "0.2.4", features = [ "time", "signal" ] }
+polldaddy = { path = "../polldaddy" }
+futures = { version = "0.3.1", features = [ "async-await" ] }
