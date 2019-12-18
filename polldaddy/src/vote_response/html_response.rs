@@ -154,5 +154,3 @@ fn get_votes_from_node(el: Node) -> Result<u64, AnswerResponseError> {
         .parse()
         .map_err(AnswerResponseError::InvalidAnswerVotes)
 }
-
-//https://sacbee.com/sports/high-school/article238211104.html
