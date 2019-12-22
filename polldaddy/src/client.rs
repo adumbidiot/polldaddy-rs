@@ -30,9 +30,11 @@ pub struct Client {
 
 impl Client {
     pub fn new() -> Self {
-        Client {
-            client: reqwest::Client::new(),
-        }
+        Default::default()
+    }
+
+    pub fn from_reqwest(client: reqwest::Client) -> Self {
+        Client { client }
     }
 
     fn get_agent() -> &'static str {

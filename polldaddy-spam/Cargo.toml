@@ -5,6 +5,10 @@ authors = ["adumbidiot <nathaniel.daniel23@outlook.com>"]
 edition = "2018"
 
 [dependencies]
-tokio = { version = "0.2.4", features = [ "time", "signal" ] }
+tokio = { version = "0.2.6", features = [ "rt-threaded", "time", "signal" ] }
 polldaddy = { path = "../polldaddy" }
 futures = { version = "0.3.1", features = [ "async-await" ] }
+free-proxy-list = { path = "../free-proxy-list-rs" }
+reqwest = { git = "https://github.com/seanmonstar/reqwest", rev = "24abf2f" }
+parking_lot = "0.10.0"
+crossbeam-queue = "0.2.0"

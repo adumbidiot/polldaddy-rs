@@ -1,0 +1,15 @@
+[package]
+name = "free-proxy-list"
+version = "0.0.1"
+authors = [ "adumbidiot <nathaniel.daniel23@outlook.com>" ]
+edition = "2018"
+
+[dependencies]
+reqwest = { git = "https://github.com/seanmonstar/reqwest", rev = "24abf2f" }
+select = "0.4.3"
+bytes = "0.5.3"
+isocountry = "0.2.0"
+futures = "0.3.1"
+
+[dev-dependencies]
+tokio = "0.2.6"

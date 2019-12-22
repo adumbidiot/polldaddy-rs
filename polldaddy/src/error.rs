@@ -37,7 +37,7 @@ pub enum ErrorKind {
         name: String,
     },
     RecursiveMutCallback,
-	ExternalError,
+    ExternalError,
     NotAFunction,
 }
 
@@ -52,7 +52,7 @@ impl ErrorKind {
             }
             ducc::ErrorKind::RuntimeError { code, name } => ErrorKind::RuntimeError { code, name },
             ducc::ErrorKind::RecursiveMutCallback => ErrorKind::RecursiveMutCallback,
-			ducc::ErrorKind::ExternalError(_) => ErrorKind::ExternalError, // Data may or may not be Send. We must remove it to be Send.
+            ducc::ErrorKind::ExternalError(_) => ErrorKind::ExternalError, // Data may or may not be Send. We must remove it to be Send.
             ducc::ErrorKind::NotAFunction => ErrorKind::NotAFunction,
         }
     }

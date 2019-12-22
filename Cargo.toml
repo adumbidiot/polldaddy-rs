@@ -1,2 +1,2 @@
 [workspace]
-members = [ "polldaddy", "polldaddy-spam" ]
+members = [ "polldaddy", "polldaddy-spam", "free-proxy-list-rs" ]
