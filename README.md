@@ -24,4 +24,4 @@ I have almost no standards so anything you contribute will be an improvement. Ju
 adumbidiot (Nathaniel Daniel)
 
 ## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the [Apache](LICENSE-APACHE) or [MIT](LICENSE-MIT) licenses, at your option.

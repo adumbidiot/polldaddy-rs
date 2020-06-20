@@ -3,13 +3,14 @@ name = "free-proxy-list"
 version = "0.0.1"
 authors = [ "adumbidiot <nathaniel.daniel23@outlook.com>" ]
 edition = "2018"
+license = "MIT/Apache-2.0"
 
 [dependencies]
-reqwest = "0.10.3"
-select = "0.4.3"
-bytes = "0.5.4"
+bytes = "0.5.5"
+futures = "0.3.5"
 isocountry = "0.2.0"
-futures = "0.3.4"
+reqwest = "0.10.6"
+select = "0.4.3"
 
 [dev-dependencies]
-tokio = "0.2.12"
+tokio = "0.2.21"
