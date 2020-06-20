@@ -7,7 +7,7 @@ fn it_works() {
     let mut rt = tokio::runtime::Runtime::new().unwrap();
     let res = rt.block_on(client.get_list()).unwrap();
     assert!(!res.is_empty());
-    assert!(res.iter().find(|el| el.is_ok()).is_some());
+    assert!(res.iter().any(|el| el.is_ok()));
 
     let ret = rt.block_on(free_proxy_list::probe(
         res.iter().filter_map(|el| el.as_ref().ok()),
