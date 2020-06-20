@@ -1,14 +1,15 @@
 [package]
 name = "polldaddy-spam"
 version = "0.0.1"
-authors = ["adumbidiot <nathaniel.daniel23@outlook.com>"]
+authors = [ "adumbidiot <nathaniel.daniel23@outlook.com>" ]
 edition = "2018"
+license = "MIT/Apache-2.0"
 
 [dependencies]
-tokio = { version = "0.2.12", features = [ "rt-threaded", "time", "signal" ] }
-polldaddy = { path = "../polldaddy" }
-futures = { version = "0.3.4", features = [ "async-await" ] }
-free-proxy-list = { path = "../free-proxy-list-rs" }
-reqwest = "0.10.3"
-parking_lot = "0.10.0"
 crossbeam-queue = "0.2.1"
+free-proxy-list = { path = "../free-proxy-list-rs" }
+futures = { version = "0.3.4", features = [ "async-await" ] }
+parking_lot = "0.10.0"
+polldaddy = { path = "../polldaddy" }
+reqwest = "0.10.3"
+tokio = { version = "0.2.12", features = [ "rt-threaded", "time", "signal", "parking_lot" ] }
