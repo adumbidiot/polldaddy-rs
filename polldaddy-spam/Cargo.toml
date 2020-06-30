@@ -9,7 +9,7 @@ license = "MIT/Apache-2.0"
 crossbeam-queue = "0.2.3"
 free-proxy-list = { path = "../free-proxy-list-rs" }
 futures = { version = "0.3.5", features = [ "async-await" ] }
-parking_lot = "0.10.2"
+parking_lot = "0.11.0"
 polldaddy = { path = "../polldaddy" }
 reqwest = "0.10.6"
 tokio = { version = "0.2.21", features = [ "rt-threaded", "time", "signal", "parking_lot" ] }
