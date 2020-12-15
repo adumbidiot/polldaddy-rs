@@ -24,10 +24,10 @@ fn proxy_spam(ctx: &mut AppContext) {
         while !should_exit {
             println!("Locating proxies...");
             let maybe_data = futures::select! {
-                wait = manager.fetch_proxies_and_spawn(Duration::from_secs(10)).fuse() => {
-                    Some(wait)
+                _wait = manager.fetch_proxies_and_spawn(Duration::from_secs(10)).fuse() => {
+                    Some(_wait)
                 },
-                exit = tokio::signal::ctrl_c().fuse() => {
+                _exit = tokio::signal::ctrl_c().fuse() => {
                     None  // Exit if the ctrl c handler fails to bind
                 },
             };
@@ -146,7 +146,7 @@ fn local_spam(ctx: &mut AppContext) {
             println!();
 
             should_exit = futures::select! {
-                wait = tokio::time::delay_for(Duration::from_secs(delay)).fuse() => Ok(false),
+                _wait = tokio::time::delay_for(Duration::from_secs(delay)).fuse() => Ok(false),
                 exit = tokio::signal::ctrl_c().fuse() => exit.map(|_| true),
             }
             .unwrap_or(true); // Exit if the ctrl c handler fails to bind

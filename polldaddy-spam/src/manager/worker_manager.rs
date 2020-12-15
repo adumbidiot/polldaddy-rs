@@ -124,8 +124,8 @@ impl Worker {
         let (tx, rx) = tokio::sync::oneshot::channel::<()>();
         *self.sleep.write() = Some(tx);
         futures::select! {
-            delay = tokio::time::delay_for(time).fuse() => (),
-            interrupt = rx.fuse() => (),
+            _ = tokio::time::delay_for(time).fuse() => {},
+            _ = rx.fuse() => {},
         }
         *self.sleep.write() = None;
     }
