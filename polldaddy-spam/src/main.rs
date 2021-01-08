@@ -65,7 +65,7 @@ fn proxy_spam(ctx: &mut AppContext) {
             println!();
             println!("# of Workers: {}", manager.len());
 
-            while let Ok(msg) = manager.read_message() {
+            while let Some(msg) = manager.read_message() {
                 match msg.data {
                     Ok(res) => {
                         match res.html() {
@@ -146,7 +146,7 @@ fn local_spam(ctx: &mut AppContext) {
             println!();
 
             should_exit = futures::select! {
-                _wait = tokio::time::delay_for(Duration::from_secs(delay)).fuse() => Ok(false),
+                _wait = tokio::time::sleep(Duration::from_secs(delay)).fuse() => Ok(false),
                 exit = tokio::signal::ctrl_c().fuse() => exit.map(|_| true),
             }
             .unwrap_or(true); // Exit if the ctrl c handler fails to bind
@@ -162,8 +162,7 @@ pub struct AppContext {
 }
 
 fn main() {
-    let mut rt = match tokio::runtime::Builder::new()
-        .threaded_scheduler()
+    let rt = match tokio::runtime::Builder::new_multi_thread()
         .enable_time()
         .enable_io()
         .build()

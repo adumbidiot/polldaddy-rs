@@ -1,10 +1,7 @@
 pub mod atomic_id_gen;
 
 use self::atomic_id_gen::AtomicIdGen;
-use crossbeam_queue::{
-    PopError,
-    SegQueue,
-};
+use crossbeam_queue::SegQueue;
 use futures::FutureExt;
 use parking_lot::RwLock;
 use polldaddy::{
@@ -55,7 +52,7 @@ impl WorkerManager {
             worker.request_shutdown();
         }
 
-        while let Ok(_msg) = self.read_message() {}
+        while let Some(_msg) = self.read_message() {}
     }
 
     pub fn cleanup_worker(&self, id: u64) {
@@ -66,7 +63,7 @@ impl WorkerManager {
         self.workers.read().len()
     }
 
-    pub fn read_message(&self) -> Result<WorkerMessage, PopError> {
+    pub fn read_message(&self) -> Option<WorkerMessage> {
         self.worker_messages.pop()
     }
 }
@@ -124,7 +121,7 @@ impl Worker {
         let (tx, rx) = tokio::sync::oneshot::channel::<()>();
         *self.sleep.write() = Some(tx);
         futures::select! {
-            _ = tokio::time::delay_for(time).fuse() => {},
+            _ = tokio::time::sleep(time).fuse() => {},
             _ = rx.fuse() => {},
         }
         *self.sleep.write() = None;

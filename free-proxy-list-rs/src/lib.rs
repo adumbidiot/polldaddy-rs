@@ -5,7 +5,6 @@ pub use crate::proxy_info::{
     ProxyInfo,
     ProxyInfoError,
 };
-use bytes::buf::ext::BufExt;
 pub use isocountry::CountryCode;
 use select::{
     document::Document,
@@ -57,8 +56,8 @@ impl Client {
             .send()
             .await?;
 
-        let body = res.bytes().await?;
-        let doc = Document::from_read(body.reader())?;
+        let text = res.text().await?;
+        let doc = Document::from(text.as_str());
 
         let table = doc
             .find(Attr("id", "proxylisttable"))

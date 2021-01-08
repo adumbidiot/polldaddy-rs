@@ -6,7 +6,6 @@ use crate::{
     VoteResponse,
     USER_AGENTS_LIST,
 };
-use bytes::buf::ext::BufExt;
 use futures::stream::StreamExt;
 use rand::seq::IteratorRandom;
 use reqwest::header::{
@@ -60,8 +59,8 @@ impl Client {
             return Err(PollError::InvalidStatus(status));
         }
 
-        let data = res.text().await?;
-        Ok(Nonce::from_script_data(&data, quiz)?)
+        let text = res.text().await?;
+        Ok(Nonce::from_script_data(&text, quiz)?)
     }
 
     pub async fn vote(&self, quiz: &Quiz, choice_index: usize) -> PollResult<VoteResponse> {
@@ -95,10 +94,10 @@ impl Client {
     pub async fn quiz_from_url(&self, referer: &str) -> PollResult<Vec<PollResult<Quiz>>> {
         let res = self.client.get(referer).send().await?; // Probably don't care if the status is invalid
 
-        let res = res.bytes().await?.reader();
+        let text = res.text().await?;
         let script_filter = And(Name("script"), Attr("src", ()));
         let data_pairs: Vec<(Url, u32)> = {
-            let doc = Document::from_read(res)?;
+            let doc = Document::from(text.as_str());
 
             doc.find(script_filter)
                 .filter_map(|el| {

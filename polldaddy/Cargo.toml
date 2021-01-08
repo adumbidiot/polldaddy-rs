@@ -6,12 +6,11 @@ edition = "2018"
 license = "MIT/Apache-2.0"
 
 [dependencies]
-bytes = "0.5.5"
-ducc = "0.1.4"
-futures = "0.3.5"
-rand = "0.8.0"
-reqwest = { version = "0.10.6", features = [ "gzip" ] }
+ducc = "0.1.5"
+futures = "0.3.8"
+rand = "0.8.1"
+reqwest = { version = "0.11.0", features = [ "gzip" ] }
 select = "0.5.0"
-serde = { version = "1.0.114", features = [ "derive" ] }
-serde_json = "1.0.56"
-url = "2.1.1"
+serde = { version = "1.0.118", features = [ "derive" ] }
+serde_json = "1.0.61"
+url = "2.2.0"

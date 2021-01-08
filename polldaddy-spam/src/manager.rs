@@ -4,7 +4,6 @@ pub use crate::manager::worker_manager::{
     WorkerManager,
     WorkerMessage,
 };
-use crossbeam_queue::PopError;
 use free_proxy_list::ProxyInfo;
 use parking_lot::RwLock;
 use polldaddy::Quiz;
@@ -59,7 +58,7 @@ impl Manager {
         self.worker_manager.len()
     }
 
-    pub fn read_message(&self) -> Result<WorkerMessage, PopError> {
+    pub fn read_message(&self) -> Option<WorkerMessage> {
         self.worker_manager.read_message()
     }
 
@@ -70,7 +69,7 @@ impl Manager {
     pub async fn exit(&self) -> usize {
         self.worker_manager.shutdown();
         self.is_shutdown.store(true, Ordering::SeqCst);
-        tokio::time::delay_for(Duration::from_secs(20)).await;
+        tokio::time::sleep(Duration::from_secs(20)).await;
         self.len()
     }
 
