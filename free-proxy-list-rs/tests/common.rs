@@ -4,7 +4,7 @@ use std::time::Duration;
 #[test]
 fn it_works() {
     let client = Client::new();
-    let mut rt = tokio::runtime::Runtime::new().unwrap();
+    let rt = tokio::runtime::Runtime::new().unwrap();
     let res = rt.block_on(client.get_list()).unwrap();
     assert!(!res.is_empty());
     assert!(res.iter().any(|el| el.is_ok()));
